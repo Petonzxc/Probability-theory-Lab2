@@ -1,0 +1,42 @@
+import numpy as np
+from math import ceil
+from math import sqrt
+from fractions import Fraction
+from scipy.stats import norm
+
+eps = 0.01
+delta = 0.05
+lam = 9
+
+
+def make_experiments(n):
+    count_of_experiments = 100
+    successful_experiments = 0
+    for _ in range(count_of_experiments):
+        x = np.random.poisson(lam, n)
+        cur_value = np.abs(np.sum(x) / n - lam)
+        if cur_value <= eps:
+            successful_experiments += 1
+    print(successful_experiments)
+
+
+eps_fr = Fraction(1, 100)
+delta_fr = Fraction(5, 100)
+
+n = 0
+for l in range(1, 10):
+    cur_n = ceil(Fraction(l, eps_fr * eps_fr * delta_fr))
+    print(cur_n, end=" ")
+    if cur_n > n:
+        n = cur_n
+print(n)
+make_experiments(n)
+
+n = 0
+for l in range(1, 10):
+    cur_n = ceil((norm.ppf(1 - delta) * sqrt(l) / eps) ** 2)
+    print(cur_n, end=" ")
+    if cur_n > n:
+        n = cur_n
+print(n)
+make_experiments(n)
