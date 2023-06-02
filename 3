@@ -1,0 +1,109 @@
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+from scipy.stats import rv_continuous
+
+# 1
+class MyDistribution(rv_continuous):
+    def _pdf(self, x):
+        return 4 * np.log(x) ** 3 / x
+
+def p(x):
+    return 4 * np.log(x) ** 3 / x
+
+def F(x):
+    return np.log(x) ** 4
+
+def get_pdf_plot():
+    data = np.linspace(1, np.e, 1000)
+    plt.plot(data, p(data))
+    plt.title('График плотности')
+    plt.fill_between(data, p(data), color='y')
+    plt.show()
+
+
+def get_distribution_plot():
+    t = np.linspace(1, np.e, 100)
+    res = np.array([F(t_) for t_ in t])
+    plt.plot(t, res)
+    plt.title('График распределения')
+    plt.show()
+
+def gen_point(max_y):
+    while True:
+        x = np.random.uniform(1, np.e)
+        y = np.random.uniform(0, max_y)
+        if y <= p(x):
+            return x
+
+def gen_points(max_y, n):
+    return np.array([gen_point(max_y) for _ in range(n)])
+
+def rejecting_sampling():
+    max_y = p(np.e)
+    ns = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120]
+    times = []
+    for n in ns:
+        start_time = time.time()
+        gen_points(max_y, n)
+        end_time = time.time()
+        times.append(end_time - start_time)
+        print(f"n={n}, time={end_time - start_time}")
+    plt.plot(times, ns)
+    plt.title("Зависимость времени генерации от размера")
+    plt.show()
+
+    ns = [10000, 100000, 100000 * 5, 1000000, 1000000 * 2]
+    times = []
+    for n in ns:
+        start_time = time.time()
+        gen_points(max_y, n)
+        end_time = time.time()
+        times.append(end_time - start_time)
+        print(f"n={n}, time={end_time - start_time}")
+    plt.plot(times, ns)
+    plt.title("Зависимость времени генерации от размера")
+    plt.show()
+
+get_pdf_plot()
+get_distribution_plot()
+rejecting_sampling()
+distribution = MyDistribution(a=1, b=np.e)
+times = []
+ns = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120]
+for n in ns:
+    start_time = time.time()
+    distribution.rvs(size=n)
+    end_time = time.time()
+    times.append(end_time - start_time)
+    print(f"n={n}, time={end_time - start_time}")
+plt.plot(times, ns)
+plt.title("Зависимость времени генерации от размера")
+plt.show()
+
+ns = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+times = []
+for n in ns:
+    start_time = time.time()
+    distribution.rvs(size=n)
+    end_time = time.time()
+    times.append(end_time - start_time)
+    print(f"n={n}, time={end_time - start_time}")
+
+
+# 2
+def F_inv(x):
+    return np.exp(np.float_power(x, 1/4))
+
+ns = [10000, 100000, 100000 * 5, 1000000, 1000000 * 2, 1000000 * 5, 10000000, 10000000 * 5]
+times = []
+for n in ns:
+    start_time = time.time()
+    F_inv(np.random.uniform(0, 1, size=n))
+    end_time = time.time()
+    times.append(end_time - start_time)
+    print(f"n={n}, time={end_time - start_time}")
+plt.plot(times, ns)
+plt.title("Зависимость времени генерации от размера")
+plt.show()
+
